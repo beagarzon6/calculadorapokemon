@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Daño Pokémon</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        label, input, button { margin: 10px; }
+        input { padding: 5px; }
+    </style>
+</head>
+<body>
+    <h1>Calculadora de Daño Pokémon</h1>
+    <form id="damageForm">
+        <label for="attacker_attack">Ataque del atacante:</label>
+        <input type="number" id="attacker_attack" required><br>
+
+        <label for="attacker_level">Nivel del atacante:</label>
+        <input type="number" id="attacker_level" required><br>
+
+        <label for="effectiveness">Efectividad:</label>
+        <input type="number" id="effectiveness" step="0.1" required><br>
+
+        <label for="defender_defense">Defensa del atacado:</label>
+        <input type="number" id="defender_defense" required><br>
+
+        <label for="defender_level">Nivel del atacado:</label>
+        <input type="number" id="defender_level" required><br>
+
+        <button type="button" onclick="calculateDamage()">Calcular Daño</button>
+    </form>
+    <h2>Resultado: <span id="damageResult"></span></h2>
+
+    <script>
+        function calculateDamage() {
+            var attack = parseInt(document.getElementById("attacker_attack").value);
+            var attackerLevel = parseInt(document.getElementById("attacker_level").value);
+            var effectiveness = parseFloat(document.getElementById("effectiveness").value);
+            var defense = parseInt(document.getElementById("defender_defense").value);
+            var defenderLevel = parseInt(document.getElementById("defender_level").value);
+
+            var damage = ((attack + attackerLevel) * effectiveness) / (defense + defenderLevel);
+            document.getElementById("damageResult").textContent = damage.toFixed(2);
+        }
+    </script>
+</body>
+</html>

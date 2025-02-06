@@ -1,48 +1,232 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculadora de Daño Pokémon</title>
-    <style>
-        body { font-family: Arial, sans-serif; padding: 20px; }
-        label, input, button { margin: 10px; }
-        input { padding: 5px; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Batalla Pokémon</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #abbcd1;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      color: #303030;
+    }
+    .container {
+      display: flex;
+      justify-content: space-around;
+    }
+    .card {
+      background-color: #e0e5f0;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
+      width: 40%;
+    }
+    .form-group {
+      margin-bottom: 15px;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+    }
+    input, select {
+      width: 100%;
+      padding: 8px;
+      box-sizing: border-box;
+    }
+    .progress-bar {
+      width: 100%;
+      background-color: #ccc;
+      border-radius: 5px;
+      margin-top: 10px;
+    }
+    .progress {
+      height: 20px;
+      border-radius: 5px;
+    }
+    .log {
+      background-color: #fff;
+      padding: 10px;
+      margin-top: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+  </style>
 </head>
 <body>
-    <h1>Calculadora de Daño Pokémon</h1>
-    <form id="damageForm">
-        <label for="attacker_attack">Ataque del atacante:</label>
-        <input type="number" id="attacker_attack" required><br>
+  <h1>Batalla Pokémon</h1>
+  <div class="container">
+    <div class="card">
+      <h2>Pokémon 1</h2>
+      <div class="form-group">
+        <label for="pokemon1">Nombre</label>
+        <input type="text" id="pokemon1" oninput="updatePokemonData(1)">
+      </div>
+      <div class="form-group">
+        <label for="nivel1">Nivel</label>
+        <input type="number" id="nivel1" oninput="updateHP(1)">
+      </div>
+      <div class="form-group">
+        <label for="defensa1">Defensa</label>
+        <input type="number" id="defensa1" min="0" oninput="updateDefensa(1)">
+      </div>
+      <div class="form-group">
+        <label for="hp1">PS Actuales</label>
+        <input type="number" id="hp1" min="0" oninput="updateHP(1)">
+      </div>
+      <div class="progress-bar">
+      </div>
+      <div class="progress-bar">
+        <div class="progress" id="hp1-bar"></div>
+      </div>
+      <div id="hp1-display">PS Actuales:</div>
+    </div>
+    <div class="card">
+      <h2>Pokémon 2</h2>
+      <div class="form-group">
+        <label for="pokemon2">Nombre</label>
+        <input type="text" id="pokemon2" oninput="updatePokemonData(2)">
+      </div>
+      <div class="form-group">
+        <label for="nivel2">Nivel</label>
+        <input type="number" id="nivel2" oninput="updateHP(2)">
+      </div>
+      <div class="form-group">
+        <label for="defensa2">Defensa</label>
+        <input type="number" id="defensa2" min="0" oninput="updateDefensa(2)">
+      </div>
+      <div class="form-group">
+        <label for="hp2">PS Actuales</label>
+        <input type="number" id="hp2" min="0" oninput="updateHP(2)">
+      </div>
+      <div class="progress-bar">
+        <div class="progress" id="hp2-bar"></div>
+      </div>
+      <div id="hp2-display">PS Actuales:</div>
+    </div>
+  </div>
+  <br><br>
+  <div class="container">
+    <div class="card">
+      <h2>Movimientos Pokémon 1</h2>
+      <div class="form-group">
+        <label for="ataque1">Ataque</label>
+        <input type="number" id="ataque1">
+      </div>
+      <div class="form-group">
+        <label for="efectividad1">Efectividad</label>
+        <select id="efectividad1">
+          <option value="0.25">0.25</option>
+          <option value="0.5">0.5</option>
+          <option value="1" selected>1</option>
+          <option value="2">2</option>
+          <option value="4">4</option>
+        </select>
+      </div>
+      <button onclick="handleAttack(1)">Ataca</button>
+    </div>
+    <div class="card">
+      <h2>Movimientos Pokémon 2</h2>
+      <div class="form-group">
+        <label for="ataque2">Ataque</label>
+        <input type="number" id="ataque2">
+      </div>
+      <div class="form-group">
+        <label for="efectividad2">Efectividad</label>
+        <select id="efectividad2">
+          <option value="0.25">0.25</option>
+          <option value="0.5">0.5</option>
+          <option value="1" selected>1</option>
+          <option value="2">2</option>
+          <option value="4">4</option>
+        </select>
+      </div>
+      <button onclick="handleAttack(2)">Ataca</button>
+    </div>
+  </div>
+  <div class="log" id="log"></div>
 
-        <label for="attacker_level">Nivel del atacante:</label>
-        <input type="number" id="attacker_level" required><br>
+  <script>
+    const POKEMON_DATA = {
+      Chimchar: { defensa: 8, hpTotal: 88 },
+      Monferno: { defensa: 10, hpTotal: 128 },
+      Infernape: { defensa: 13, hpTotal: 152 },
+      Piplup: { defensa: 10, hpTotal: 106 },
+      Prinplup: { defensa: 12, hpTotal: 128 },
+      Turtwing: { defensa: 11, hpTotal: 110 },
+      // Agrega más Pokémon aquí
+    };
 
-        <label for="effectiveness">Efectividad:</label>
-        <input type="number" id="effectiveness" step="0.1" required><br>
+    function updatePokemonData(pokemonNum) {
+      const pokemonName = document.getElementById(`pokemon${pokemonNum}`).value;
+      if (POKEMON_DATA[pokemonName]) {
+        const { defensa, hpTotal } = POKEMON_DATA[pokemonName];
+        document.getElementById(`hp${pokemonNum}`).value = hpTotal;
+        document.getElementById(`hp${pokemonNum}`).max = hpTotal;
+        document.getElementById(`defensa${pokemonNum}`).value = defensa;
+        updateHP(pokemonNum);
+        updateDefensa(pokemonNum);
+      }
+    }
 
-        <label for="defender_defense">Defensa del atacado:</label>
-        <input type="number" id="defender_defense" required><br>
+    function updateHP(pokemonNum) {
+      const hp = document.getElementById(`hp${pokemonNum}`).value;
+      const hpTotal = document.getElementById(`hp${pokemonNum}`).max;
+      const percentage = (hp / hpTotal) * 100;
+      const hpBar = document.getElementById(`hp${pokemonNum}-bar`);
+      const hpDisplay = document.getElementById(`hp${pokemonNum}-display`);
+      hpDisplay.textContent = `PS Actuales: ${hp}`;
+      hpBar.style.width = `${percentage}%`;
+      if (percentage > 60) {
+        hpBar.style.backgroundColor = 'green';
+      } else if (percentage > 18) {
+        hpBar.style.backgroundColor = 'yellow';
+      } else {
+        hpBar.style.backgroundColor = 'red';
+      }
+    }
 
-        <label for="defender_level">Nivel del atacado:</label>
-        <input type="number" id="defender_level" required><br>
+    function updateDefensa(pokemonNum) {
+  const defensa = document.getElementById(`defensa${pokemonNum}`).value;
+  const defensaDisplay = document.getElementById(`defensa${pokemonNum}-display`);
+  defensaDisplay.textContent = `Defensa Actual: ${defensa}`;
+  const pokemonName = document.getElementById(`pokemon${pokemonNum}`).value;
+  if (POKEMON_DATA[pokemonName]) {
+    POKEMON_DATA[pokemonName].defensa = parseInt(defensa);
+  }
 
-        <button type="button" onclick="calculateDamage()">Calcular Daño</button>
-    </form>
-    <h2>Resultado: <span id="damageResult"></span></h2>
+}
 
-    <script>
-        function calculateDamage() {
-            var attack = parseInt(document.getElementById("attacker_attack").value);
-            var attackerLevel = parseInt(document.getElementById("attacker_level").value);
-            var effectiveness = parseFloat(document.getElementById("effectiveness").value);
-            var defense = parseInt(document.getElementById("defender_defense").value);
-            var defenderLevel = parseInt(document.getElementById("defender_level").value);
 
-            var damage = ((attack + attackerLevel) * effectiveness) / (defense + defenderLevel);
-            document.getElementById("damageResult").textContent = damage.toFixed(2);
-        }
-    </script>
+function handleAttack(atacante) {
+  const defensor = atacante === 1 ? 2 : 1;
+  const nivelAtacante = document.getElementById(`nivel${atacante}`).value;
+  const nivelDefensor = document.getElementById(`nivel${defensor}`).value;
+  const ataque = document.getElementById(`ataque${atacante}`).value;
+  const efectividad = document.getElementById(`efectividad${atacante}`).value;
+  const hpDefensor = document.getElementById(`hp${defensor}`).value;
+  const pokemonAtacante = document.getElementById(`pokemon${atacante}`).value;
+  const pokemonDefensor = document.getElementById(`pokemon${defensor}`).value;
+  const defensaDefensor = parseInt(document.getElementById(`defensa${defensor}`).value);
+
+  const daño = Math.round(((parseInt(ataque) + parseInt(nivelAtacante)) * efectividad) / (defensaDefensor + parseInt(nivelDefensor)) * 20);
+  const newHP = Math.max(hpDefensor - daño, 0);
+
+  document.getElementById(`hp${defensor}`).value = newHP;
+  updateHP(defensor);
+
+  let logEntry = `${pokemonAtacante} atacó a ${pokemonDefensor}, causando ${daño} PS de daño.`;
+  if (newHP === 0) {
+    logEntry += ` ${pokemonDefensor} ha sido derrotado.`;
+  }
+
+  const log = document.getElementById('log');
+  log.innerHTML += `<p>${logEntry}</p>`;
+}
+
+  </script>
 </body>
 </html>
